@@ -19,6 +19,13 @@ from __future__ import annotations
 import os
 import threading
 
+try:
+    import fcntl
+
+    _HAVE_FCNTL = True
+except ImportError:  # pragma: no cover - non-POSIX platforms
+    _HAVE_FCNTL = False
+
 from .batch import WriteBatch, insert_into_memtable
 from .compaction import flush_memtable, pick_compaction, run_compaction
 from .errors import DBClosed, InvalidArgument, LockError
@@ -102,13 +109,25 @@ class DB:
 
     def _acquire_lock(self) -> None:
         path = lock_file_name(self._name)
-        try:
-            fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_RDWR, 0o644)
-        except FileExistsError as exc:
-            raise LockError(
-                f"database {self._name!r} is locked by another handle "
-                f"(remove {path} if no process is using it)"
-            ) from exc
+        locked_msg = (
+            f"database {self._name!r} is locked by another handle "
+            f"(remove {path} if no process is using it)"
+        )
+        if _HAVE_FCNTL:
+            # An advisory lock releases automatically if the process dies, so a
+            # crash never leaves a stale lock behind.
+            fd = os.open(path, os.O_CREAT | os.O_RDWR, 0o644)
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except OSError as exc:
+                os.close(fd)
+                raise LockError(locked_msg) from exc
+        else:  # pragma: no cover - non-POSIX fallback
+            try:
+                fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_RDWR, 0o644)
+            except FileExistsError as exc:
+                raise LockError(locked_msg) from exc
+        os.ftruncate(fd, 0)
         os.write(fd, str(os.getpid()).encode())
         self._lock_fd = fd
 
