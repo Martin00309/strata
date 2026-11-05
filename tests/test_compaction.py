@@ -78,7 +78,9 @@ def test_trivial_move(tmp_path):
     assert comp.is_trivial_move()
     cache = TableCache(dbname, opts)
     try:
-        edit = run_compaction(dbname, opts, v, cache, comp, smallest_snapshot=10, next_file_number=_counter(100))
+        edit = run_compaction(
+            dbname, opts, v, cache, comp, smallest_snapshot=10, next_file_number=_counter(100)
+        )
         assert (1, 5) in edit.deleted_files
         assert [(lvl, m.number) for lvl, m in edit.new_files] == [(2, 5)]
     finally:
@@ -97,7 +99,9 @@ def test_major_compaction_drops_superseded_versions(tmp_path):
     comp = Compaction(0, [[old, new], []])
     cache = TableCache(dbname, opts)
     try:
-        edit = run_compaction(dbname, opts, v, cache, comp, smallest_snapshot=10, next_file_number=_counter(100))
+        edit = run_compaction(
+            dbname, opts, v, cache, comp, smallest_snapshot=10, next_file_number=_counter(100)
+        )
         assert len(edit.new_files) == 1
         out_number = edit.new_files[0][1].number
     finally:
@@ -129,7 +133,9 @@ def test_tombstone_dropped_at_base_level(tmp_path):
     comp = Compaction(0, [[val, tomb], []])
     cache = TableCache(dbname, opts)
     try:
-        edit = run_compaction(dbname, opts, v, cache, comp, smallest_snapshot=10, next_file_number=_counter(100))
+        edit = run_compaction(
+            dbname, opts, v, cache, comp, smallest_snapshot=10, next_file_number=_counter(100)
+        )
         # Both value and tombstone are obsolete -> no output file at all.
         assert edit.new_files == []
         assert {(0, 1), (0, 2)} <= edit.deleted_files
@@ -152,7 +158,9 @@ def test_tombstone_kept_when_not_base_level(tmp_path):
     comp = Compaction(0, [[tomb], []])
     cache = TableCache(dbname, opts)
     try:
-        edit = run_compaction(dbname, opts, v, cache, comp, smallest_snapshot=10, next_file_number=_counter(100))
+        edit = run_compaction(
+            dbname, opts, v, cache, comp, smallest_snapshot=10, next_file_number=_counter(100)
+        )
         assert len(edit.new_files) == 1
         out_number = edit.new_files[0][1].number
     finally:
@@ -168,7 +176,9 @@ def test_snapshot_protects_old_version(tmp_path):
     dbname = str(tmp_path)
     opts = Options()
     t = _make_table(
-        dbname, opts, 1,
+        dbname,
+        opts,
+        1,
         [(b"k", 2, TYPE_VALUE, b"v2"), (b"k", 8, TYPE_VALUE, b"v8")],
     )
     v = Version(opts.num_levels)
@@ -180,7 +190,9 @@ def test_snapshot_protects_old_version(tmp_path):
     try:
         # Oldest live snapshot is 5: the seq-2 version must be retained because
         # a reader at snapshot 5 would see it.
-        edit = run_compaction(dbname, opts, v, cache, comp, smallest_snapshot=5, next_file_number=_counter(100))
+        edit = run_compaction(
+            dbname, opts, v, cache, comp, smallest_snapshot=5, next_file_number=_counter(100)
+        )
         out_number = edit.new_files[0][1].number
     finally:
         cache.close()
@@ -208,7 +220,9 @@ def test_output_split_by_max_file_size(tmp_path):
     comp = Compaction(0, [[a, b], []])
     cache = TableCache(dbname, opts)
     try:
-        edit = run_compaction(dbname, opts, v, cache, comp, smallest_snapshot=10, next_file_number=_counter(100))
+        edit = run_compaction(
+            dbname, opts, v, cache, comp, smallest_snapshot=10, next_file_number=_counter(100)
+        )
         assert len(edit.new_files) > 1, "expected the output to split into multiple files"
         # Every key should survive the split, in order, across files.
         all_keys = []

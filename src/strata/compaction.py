@@ -117,9 +117,7 @@ def run_compaction(
         edit.add_file(compaction.output_level, moved)
         return edit
 
-    merged = MergingIterator(
-        [table_cache.new_iterator(f.number) for f in compaction.all_inputs()]
-    )
+    merged = MergingIterator([table_cache.new_iterator(f.number) for f in compaction.all_inputs()])
     merged.seek_to_first()
 
     # Monotonic per-level cursors used by the "is this the base level for the
@@ -177,9 +175,7 @@ def run_compaction(
             # A newer version of this key (already emitted) hides this one.
             drop = True
         elif (
-            vtype == TYPE_DELETION
-            and seq <= smallest_snapshot
-            and is_base_level_for_key(user_key)
+            vtype == TYPE_DELETION and seq <= smallest_snapshot and is_base_level_for_key(user_key)
         ):
             # Obsolete tombstone with nothing older beneath it.
             drop = True

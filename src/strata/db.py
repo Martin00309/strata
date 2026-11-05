@@ -373,9 +373,7 @@ class DB:
                 "memtable_bytes": self._mem.approximate_memory_usage(),
                 "memtable_entries": len(self._mem),
                 "num_files": sum(version.num_files(i) for i in range(version.num_levels)),
-                "total_bytes": sum(
-                    version.total_file_size(i) for i in range(version.num_levels)
-                ),
+                "total_bytes": sum(version.total_file_size(i) for i in range(version.num_levels)),
                 "levels": version.level_summary(),
                 "live_snapshots": len(self._snapshots),
             }
@@ -384,9 +382,7 @@ class DB:
     def _delete_obsolete_files(self) -> None:
         version = self._vset.current
         live_tables = {
-            meta.number
-            for level in range(version.num_levels)
-            for meta in version.files[level]
+            meta.number for level in range(version.num_levels) for meta in version.files[level]
         }
         for entry in os.listdir(self._name):
             parsed = parse_file_name(entry)

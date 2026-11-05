@@ -57,7 +57,7 @@ def parse_file_name(basename: str) -> tuple[int, str] | None:
         return 0, "lock"
     if basename.startswith("MANIFEST-"):
         try:
-            return int(basename[len("MANIFEST-"):]), "manifest"
+            return int(basename[len("MANIFEST-") :]), "manifest"
         except ValueError:
             return None
     stem, dot, suffix = basename.partition(".")

@@ -168,9 +168,7 @@ class Version:
         """Point lookup walking levels shallow-to-deep."""
         # Level 0: files overlap; search newest (highest number) first.
         level0 = [
-            f
-            for f in self.files[0]
-            if f.smallest_user_key() <= user_key <= f.largest_user_key()
+            f for f in self.files[0] if f.smallest_user_key() <= user_key <= f.largest_user_key()
         ]
         level0.sort(key=lambda f: f.number, reverse=True)
         for f in level0:
@@ -277,9 +275,7 @@ class VersionSet:
         for level in range(self.options.num_levels):
             new_version.files[level] = list(base.files[level])
         for level, number in edit.deleted_files:
-            new_version.files[level] = [
-                f for f in new_version.files[level] if f.number != number
-            ]
+            new_version.files[level] = [f for f in new_version.files[level] if f.number != number]
         for level, meta in edit.new_files:
             new_version.files[level].append(meta)
         # Keep levels >= 1 sorted by smallest internal key (non-overlapping).
@@ -339,9 +335,7 @@ class VersionSet:
         """Rebuild the current version by replaying the manifest."""
         with open(current_file_name(self.dbname), encoding="utf-8") as f:
             manifest_name = f.read().strip()
-        manifest_path = descriptor_file_name(
-            self.dbname, int(manifest_name.split("-")[1])
-        )
+        manifest_path = descriptor_file_name(self.dbname, int(manifest_name.split("-")[1]))
         version = Version(self.options.num_levels)
         log_number = last_sequence = next_file = None
         comparator = None

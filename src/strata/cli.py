@@ -201,11 +201,15 @@ def _cmd_bench(args) -> int:
         read_elapsed = time.perf_counter() - start
 
     total_bytes = args.count * (args.value_size + 20)
-    print(f"wrote {args.count} keys in {write_elapsed:.3f}s "
-          f"({args.count / write_elapsed:,.0f} ops/s, "
-          f"{total_bytes / write_elapsed / 1e6:.1f} MB/s)")
-    print(f"read  {args.count} keys in {read_elapsed:.3f}s "
-          f"({args.count / read_elapsed:,.0f} ops/s), {hits} hits")
+    print(
+        f"wrote {args.count} keys in {write_elapsed:.3f}s "
+        f"({args.count / write_elapsed:,.0f} ops/s, "
+        f"{total_bytes / write_elapsed / 1e6:.1f} MB/s)"
+    )
+    print(
+        f"read  {args.count} keys in {read_elapsed:.3f}s "
+        f"({args.count / read_elapsed:,.0f} ops/s), {hits} hits"
+    )
     return EXIT_OK
 
 

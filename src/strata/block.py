@@ -97,9 +97,7 @@ class Block:
             raise ValueError("corrupt block: restart array overruns block")
 
     def iterator(self) -> BlockIterator:
-        return BlockIterator(
-            self._data, self._cmp, self._restart_offset, self._num_restarts
-        )
+        return BlockIterator(self._data, self._cmp, self._restart_offset, self._num_restarts)
 
     def __iter__(self):
         it = self.iterator()

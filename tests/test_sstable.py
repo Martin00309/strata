@@ -21,9 +21,7 @@ from strata.sstable import SSTableReader, SSTableWriter
 def _write_table(path, entries, options=None):
     """entries: list of (user_key, sequence, value_type, value)."""
     options = options or Options()
-    internal = [
-        (make_internal_key(u, s, t), v) for (u, s, t, v) in entries
-    ]
+    internal = [(make_internal_key(u, s, t), v) for (u, s, t, v) in entries]
     internal.sort(key=lambda kv: cmp_to_key(compare_internal_keys)(kv[0]))
     with open(path, "wb") as f:
         writer = SSTableWriter(f, options)
