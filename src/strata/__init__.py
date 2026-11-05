@@ -23,6 +23,8 @@ See the module docstrings for the internals (``strata.wal``, ``strata.sstable``,
 
 from __future__ import annotations
 
+from .batch import WriteBatch
+from .db import DB, Snapshot
 from .errors import (
     Corruption,
     DBClosed,
@@ -35,8 +37,24 @@ from .options import Options, ReadOptions, WriteOptions
 
 __version__ = "0.1.0"
 
+
+def open(name: str, options: Options | None = None) -> DB:  # noqa: A001
+    """Open (or create) the Strata database rooted at directory ``name``.
+
+    The returned :class:`~strata.db.DB` is also a context manager::
+
+        with strata.open("./mydb") as db:
+            db.put(b"k", b"v")
+    """
+    return DB.open(name, options)
+
+
 __all__ = [
     "__version__",
+    "open",
+    "DB",
+    "Snapshot",
+    "WriteBatch",
     "Options",
     "ReadOptions",
     "WriteOptions",

@@ -45,6 +45,30 @@ def temp_file_name(dbname: str, number: int) -> str:
     return _numbered(dbname, number, ".dbtmp")
 
 
+def parse_file_name(basename: str) -> tuple[int, str] | None:
+    """Classify a bare filename. Returns ``(number, kind)`` or ``None``.
+
+    ``kind`` is one of ``"log"``, ``"table"``, ``"manifest"``, ``"current"``,
+    ``"lock"`` or ``"temp"``. ``number`` is 0 for the kinds that have none.
+    """
+    if basename == "CURRENT":
+        return 0, "current"
+    if basename == "LOCK":
+        return 0, "lock"
+    if basename.startswith("MANIFEST-"):
+        try:
+            return int(basename[len("MANIFEST-"):]), "manifest"
+        except ValueError:
+            return None
+    stem, dot, suffix = basename.partition(".")
+    if not dot or not stem.isdigit():
+        return None
+    kind = {"log": "log", "sst": "table", "dbtmp": "temp"}.get(suffix)
+    if kind is None:
+        return None
+    return int(stem), kind
+
+
 __all__ = [
     "log_file_name",
     "table_file_name",
@@ -52,4 +76,5 @@ __all__ = [
     "current_file_name",
     "lock_file_name",
     "temp_file_name",
+    "parse_file_name",
 ]
