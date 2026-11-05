@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.tox/
+htmlcov/
+.coverage
+.coverage.*
+
+# Strata local data — on-disk stores created while developing / benchmarking
+*.strata/
+testdb/
+benchdb/
+scratch/
+
+# Secrets — never commit real secrets; use placeholders such as .env.example
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+token.txt
+*.token
+secrets.*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Logs / scratch
+*.log
