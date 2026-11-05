@@ -94,6 +94,11 @@ class SSTableWriter:
         self._pending_index_key: bytes | None = None
         self._finished = False
 
+    @property
+    def current_size(self) -> int:
+        """Bytes written to the file so far (excludes the unflushed block)."""
+        return self._offset
+
     def add(self, internal_key: bytes, value: bytes) -> None:
         assert not self._finished, "add() after finish()"
         if self._last_key is not None:
